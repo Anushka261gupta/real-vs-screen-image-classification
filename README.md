@@ -1,63 +1,103 @@
-# Real vs Screen Image Classification
+# 📷 Real vs Screen Image Classification
 
-A deep learning-based binary image classification system that determines whether an image is:
+A deep learning-based binary image classification system that identifies whether an image is:
 
 - 📷 **Real Camera Image**
-- 🖥️ **Photo of a Screen**
+- 🖥️ **Photo of a Digital Screen**
 
-The project uses **transfer learning with MobileNetV3-Small** and is trained on a manually collected dataset consisting of real camera photographs and recaptured screen images.
-
----
-
-## Project Overview
-
-Images captured directly from a camera and photographs taken of digital screens often exhibit different visual characteristics such as edge sharpness, frequency patterns, reflections, and display artifacts.
-
-This project investigates these differences and builds a lightweight deep learning classifier capable of distinguishing between the two categories.
+The project uses **Transfer Learning with MobileNetV3-Small** to classify images captured using a smartphone camera. A custom dataset was manually collected for this assignment, followed by exploratory data analysis, model training, evaluation, and inference.
 
 ---
 
-## Dataset
+# 🚀 Project Overview
 
-The dataset was manually collected for this assignment.
+Photographs captured directly from a camera and photographs taken of digital screens exhibit different visual characteristics such as:
+
+- Frequency domain patterns
+- Display artifacts
+- Edge density
+- Reflections
+- Pixel grid effects
+
+This project explores these differences and trains a lightweight deep learning model capable of distinguishing between the two image categories.
+
+---
+
+# 📂 Dataset
+
+The dataset was manually collected using a smartphone camera.
 
 | Class | Images |
 |-------|--------|
-| Real Camera Images | 109 |
-| Screen Photos | 108 |
+| 📷 Real Camera Images | 109 |
+| 🖥️ Screen Photos | 108 |
 | **Total** | **217** |
 
-Images were collected using a smartphone camera under different lighting conditions and object types.
+The images include multiple indoor and outdoor scenes captured under different lighting conditions and object categories.
 
 ---
 
-## Exploratory Data Analysis (EDA)
+# 🖼️ Sample Images
 
-Before training the model, exploratory analysis was performed to understand the visual differences between the two classes.
+| Real Camera Image | Screen Photo |
+|:-----------------:|:------------:|
+| <img src="results/sample_real.jpg" width="300"> | <img src="results/sample_screen.jpg" width="300"> |
+
+---
+
+# 📊 Exploratory Data Analysis (EDA)
+
+Before training the model, several exploratory analyses were performed to understand the visual differences between the two classes.
 
 The analysis included:
 
-- Image resolution analysis
-- FFT (Fast Fourier Transform) visualization
-- Edge density analysis
-- Visual inspection of reflections and display artifacts
-
-These observations motivated the use of a transfer learning approach with MobileNetV3.
+- Image Resolution Analysis
+- Fast Fourier Transform (FFT)
+- Edge Density Analysis
+- Visual Comparison of Image Characteristics
 
 ---
 
-## Model Architecture
+# 🔍 Frequency Domain Analysis (FFT)
 
-- MobileNetV3-Small (ImageNet Pretrained)
-- Transfer Learning
-- Cross Entropy Loss
-- AdamW Optimizer
+FFT was used to visualize frequency-domain characteristics of both classes.
+
+### Real Camera Image FFT
+
+<p align="center">
+<img src="results/real_fft_comparison.png" width="700">
+</p>
+
+### Screen Photo FFT
+
+<p align="center">
+<img src="results/screen_fft_comparison.png" width="700">
+</p>
+
+The screen images exhibit stronger periodic frequency components compared to real camera images due to display pixel structures.
 
 ---
 
-## Project Structure
+# 🧠 Model Architecture
 
-```
+The classifier uses **MobileNetV3-Small** pretrained on ImageNet.
+
+### Training Configuration
+
+| Parameter | Value |
+|-----------|-------|
+| Model | MobileNetV3-Small |
+| Input Size | 224 × 224 |
+| Optimizer | AdamW |
+| Loss Function | CrossEntropyLoss |
+| Epochs | 20 |
+| Batch Size | 8 |
+
+---
+
+# 📁 Project Structure
+
+```text
 real-vs-screen-image-classification/
 │
 ├── dataset/
@@ -71,6 +111,14 @@ real-vs-screen-image-classification/
 │   └── analysis.ipynb
 │
 ├── report/
+│
+├── results/
+│   ├── confusion_matrix.png
+│   ├── roc_curve.png
+│   ├── real_fft_comparison.png
+│   ├── screen_fft_comparison.png
+│   ├── sample_real.jpg
+│   └── sample_screen.jpg
 │
 ├── src/
 │   ├── dataset.py
@@ -86,7 +134,7 @@ real-vs-screen-image-classification/
 
 ---
 
-## Installation
+# ⚙️ Installation
 
 Clone the repository
 
@@ -104,7 +152,7 @@ pip install -r requirements.txt
 
 ---
 
-## Training
+# 🏋️ Training
 
 ```bash
 python src/train.py
@@ -112,31 +160,46 @@ python src/train.py
 
 ---
 
-## Evaluation
+# 📈 Evaluation
 
 ```bash
 python src/evaluate.py
 ```
 
-Example validation results:
+### Validation Results
 
 ```
-Accuracy : 1.00
-
+Accuracy  : 1.00
 Precision : 1.00
-
-Recall : 1.00
-
-F1 Score : 1.00
+Recall    : 1.00
+F1 Score  : 1.00
 ```
 
-> These metrics were obtained on the held-out validation split used during experimentation.
+> These results were obtained on the held-out validation split used during experimentation.
 
 ---
 
-## Prediction
+# 📉 Confusion Matrix
 
-Predict a single image using:
+<p align="center">
+<img src="results/confusion_matrix.png" width="450">
+</p>
+
+---
+
+# 📊 ROC Curve
+
+<p align="center">
+<img src="results/roc_curve.png" width="450">
+</p>
+
+**ROC-AUC Score:** **1.00**
+
+---
+
+# 🔍 Prediction
+
+Run inference on a single image:
 
 ```bash
 python src/predict.py --image dataset/real/IMG_5121.jpg
@@ -146,17 +209,14 @@ Example Output
 
 ```
 Prediction         : Real Camera Image
-
 Confidence         : 99.13%
-
 Real Probability   : 99.13%
-
 Screen Probability : 0.87%
 ```
 
 ---
 
-## Technologies Used
+# 🛠️ Technologies Used
 
 - Python
 - PyTorch
@@ -168,17 +228,17 @@ Screen Probability : 0.87%
 
 ---
 
-## Future Improvements
+# 📌 Future Improvements
 
-- Larger and more diverse dataset
-- Cross-validation on multiple splits
+- Increase dataset diversity
+- Cross-validation
 - Grad-CAM visualization
 - Confidence calibration
-- Deployment as a web application
+- Web deployment using Streamlit or FastAPI
 
 ---
 
-## Author
+# 👩‍💻 Author
 
 **Anushka Gupta**
 
