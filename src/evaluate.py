@@ -1,7 +1,9 @@
 from pathlib import Path
-
+import matplotlib.pyplot as plt
+from sklearn.metrics import ConfusionMatrixDisplay
 import torch
 import numpy as np
+from sklearn.metrics import roc_curve, auc
 from sklearn.metrics import (
     accuracy_score,
     precision_score,
@@ -59,6 +61,7 @@ model.load_state_dict(
 model.eval()
 
 y_true = []
+y_scores = []
 y_pred = []
 
 with torch.no_grad():
@@ -71,8 +74,14 @@ with torch.no_grad():
 
         preds = torch.argmax(outputs, dim=1)
 
+        probs = torch.softmax(outputs, dim=1)
+
         y_true.extend(labels.numpy())
         y_pred.extend(preds.cpu().numpy())
+
+        # Probability of Screen class (class = 1)
+        y_scores.extend(probs[:, 1].cpu().numpy())
+
 
 print("\nAccuracy :", accuracy_score(y_true, y_pred))
 print("Precision:", precision_score(y_true, y_pred))
@@ -84,3 +93,71 @@ print(confusion_matrix(y_true, y_pred))
 
 print("\nClassification Report")
 print(classification_report(y_true, y_pred))
+
+# ------------------------
+# Save Confusion Matrix
+# ------------------------
+
+cm = confusion_matrix(y_true, y_pred)
+
+disp = ConfusionMatrixDisplay(
+    confusion_matrix=cm,
+    display_labels=["Real", "Screen"]
+)
+
+fig, ax = plt.subplots(figsize=(5,5))
+
+disp.plot(
+    cmap="Blues",
+    ax=ax,
+    colorbar=False
+)
+
+plt.title("Confusion Matrix")
+
+results_dir = BASE_DIR / "results"
+results_dir.mkdir(exist_ok=True)
+
+plt.savefig(
+    results_dir / "confusion_matrix.png",
+    dpi=300,
+    bbox_inches="tight"
+)
+
+plt.close()
+
+print("\nConfusion matrix saved.")
+
+
+# ------------------------
+# ROC Curve
+# ------------------------
+
+fpr, tpr, _ = roc_curve(y_true, y_scores)
+roc_auc = auc(fpr, tpr)
+
+plt.figure(figsize=(6,6))
+
+plt.plot(
+    fpr,
+    tpr,
+    linewidth=2,
+    label=f"AUC = {roc_auc:.3f}"
+)
+
+plt.plot([0,1],[0,1],'k--')
+
+plt.xlabel("False Positive Rate")
+plt.ylabel("True Positive Rate")
+plt.title("ROC Curve")
+plt.legend(loc="lower right")
+
+plt.savefig(
+    results_dir / "roc_curve.png",
+    dpi=300,
+    bbox_inches="tight"
+)
+
+plt.close()
+
+print(f"\nROC AUC Score : {roc_auc:.4f}")
